@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deposit Money</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 350px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: none;
+      height: 80px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #message {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Deposit Money</h2>
+
+    <input type="text" id="dep-accid" placeholder="Enter Account ID">
+    <input type="number" id="dep-amount" placeholder="Enter Amount">
+    <textarea id="dep-desc" placeholder="Enter Description"></textarea>
+    <button onclick="doDeposit()">Deposit</button>
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    async function doDeposit() {
+      const accountId = document.getElementById('dep-accid').value.trim();
+      const amount = document.getElementById('dep-amount').value.trim();
+      const description = document.getElementById('dep-desc').value.trim();
+      const messageBox = document.getElementById('message');
+
+      if (!accountId || !amount || !description) {
+        messageBox.textContent = "Please fill all fields.";
+        messageBox.className = "error";
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/api/transactions/deposit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZTNiZjMxMjM4ZDEwZTM0ZjQyMzc0MCIsImlhdCI6MTc3NjUzMzI5NywiZXhwIjoxNzc3MTM4MDk3fQ.h9Sgqi-yMmvDSBYt8GDApf0sFwyHgb0gwrD-dTkyyqA'
+          },
+          body: JSON.stringify({
+            accountId: accountId,
+            amount: Number(amount),
+            description: description
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          messageBox.textContent = data.message || "Deposit successful!";
+          messageBox.className = "success";
+        } else {
+          messageBox.textContent = data.message || "Deposit failed!";
+          messageBox.className = "error";
+        }
+      } catch (error) {
+        messageBox.textContent = "Server error: " + error.message;
+        messageBox.className = "error";
+      }
+    }
+  </script>
+</body>
+</html>
