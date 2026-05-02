@@ -1,129 +1,472 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deposit Money</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      width: 350px;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    input, textarea, button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-
-    textarea {
-      resize: none;
-      height: 80px;
-    }
-
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background: #0056b3;
-    }
-
-    #message {
-      margin-top: 15px;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    .success {
-      color: green;
-    }
-
-    .error {
-      color: red;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexaBank — Personal Banking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h2>Deposit Money</h2>
 
-    <input type="text" id="dep-accid" placeholder="Enter Account ID">
-    <input type="number" id="dep-amount" placeholder="Enter Amount">
-    <textarea id="dep-desc" placeholder="Enter Description"></textarea>
-    <button onclick="doDeposit()">Deposit</button>
-
-    <div id="message"></div>
+  <!-- NOTIFICATION TOAST -->
+  <div class="notification" id="toast">
+    <span class="notification-icon" id="toast-icon">✓</span>
+    <span id="toast-msg">Action completed</span>
   </div>
 
-  <script>
-    async function doDeposit() {
-      const accountId = document.getElementById('dep-accid').value.trim();
-      const amount = document.getElementById('dep-amount').value.trim();
-      const description = document.getElementById('dep-desc').value.trim();
-      const messageBox = document.getElementById('message');
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">NexaBank</div>
+      <div class="logo-sub">Private Banking</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Main</div>
+      <button class="nav-item active" onclick="navigate('dashboard', this)">
+        <span class="nav-icon">◈</span> Dashboard
+      </button>
+      <button class="nav-item" onclick="navigate('transfer', this)">
+        <span class="nav-icon">⇄</span> Transfer Money
+      </button>
+      <button class="nav-item" onclick="navigate('transactions', this)">
+        <span class="nav-icon">≡</span> Transactions
+      </button>
+      <div class="nav-label">Finance</div>
+      <button class="nav-item" onclick="navigate('loans', this)">
+        <span class="nav-icon">◉</span> Loan Management
+      </button>
+      <div class="nav-label">Account</div>
+      <button class="nav-item" onclick="navigate('settings', this)">
+        <span class="nav-icon">⚙</span> Settings & Profile
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="avatar">RK</div>
+        <div>
+          <div class="user-name">Rahul Kumar</div>
+          <div class="user-id">A/C: ••••8472</div>
+        </div>
+      </div>
+    </div>
+  </aside>
 
-      if (!accountId || !amount || !description) {
-        messageBox.textContent = "Please fill all fields.";
-        messageBox.className = "error";
-        return;
-      }
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title" id="page-title">Dashboard</div>
+      <div class="topbar-right">
+        <span class="date-tag" id="current-date"></span>
+        <button class="notif-btn" onclick="showToast('📬 3 new notifications', '🔔')">
+          🔔<span class="notif-dot"></span>
+        </button>
+      </div>
+    </header>
 
-      try {
-        const response = await fetch('http://localhost:5000/api/transactions/deposit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZTNiZjMxMjM4ZDEwZTM0ZjQyMzc0MCIsImlhdCI6MTc3NjUzMzI5NywiZXhwIjoxNzc3MTM4MDk3fQ.h9Sgqi-yMmvDSBYt8GDApf0sFwyHgb0gwrD-dTkyyqA'
-          },
-          body: JSON.stringify({
-            accountId: accountId,
-            amount: Number(amount),
-            description: description
-          })
-        });
+    <!-- ═══════════ DASHBOARD ═══════════ -->
+    <section class="page active" id="page-dashboard">
+      <div class="grid-4">
+        <div class="stat-card gold">
+          <div class="stat-label">Total Balance</div>
+          <div class="stat-value">₹2,84,350</div>
+          <div class="stat-change up">▲ 3.2% this month</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Monthly Income</div>
+          <div class="stat-value">₹95,000</div>
+          <div class="stat-change up">▲ Salary credited</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Monthly Spend</div>
+          <div class="stat-value">₹42,180</div>
+          <div class="stat-change down">▼ 8.1% vs last month</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Savings Rate</div>
+          <div class="stat-value">55.6%</div>
+          <div class="stat-change up">▲ On track</div>
+        </div>
+      </div>
 
-        const data = await response.json();
+      <div class="grid-2">
+        <div>
+          <div class="section-header">
+            <div>
+              <div class="section-title">Your Card</div>
+              <div class="section-sub">Primary savings account</div>
+            </div>
+            <button class="btn btn-outline btn-sm">Manage</button>
+          </div>
+          <div class="bank-card">
+            <div>
+              <div class="card-chip">⬛</div>
+              <div class="card-balance-label">Available Balance</div>
+              <div class="card-balance">₹2,84,350.00</div>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-number">•••• •••• •••• 8472</div>
+                <div class="card-holder">RAHUL KUMAR</div>
+                <div class="card-expiry">Valid thru 08/28</div>
+              </div>
+              <div class="card-logo">Nexa</div>
+            </div>
+          </div>
+        </div>
 
-        if (response.ok) {
-          messageBox.textContent = data.message || "Deposit successful!";
-          messageBox.className = "success";
-        } else {
-          messageBox.textContent = data.message || "Deposit failed!";
-          messageBox.className = "error";
-        }
-      } catch (error) {
-        messageBox.textContent = "Server error: " + error.message;
-        messageBox.className = "error";
-      }
-    }
-  </script>
+        <div class="card">
+          <div class="card-title">Monthly Spending</div>
+          <div class="card-subtitle">Jan – Jul 2025 overview</div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-size:12px;color:var(--text-muted)">Jan</span>
+            <span style="font-size:12px;color:var(--text-muted)">Jul</span>
+          </div>
+          <div class="mini-chart" id="spend-chart"></div>
+          <div class="chart-footer">
+            <div><div class="chart-footer-label">Avg Monthly</div><div class="chart-footer-val">₹38,400</div></div>
+            <div style="text-align:right"><div class="chart-footer-label">Highest</div><div class="chart-footer-val">₹54,200</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">Quick Actions</div>
+      </div>
+      <div class="quick-actions">
+        <button class="qa-btn" onclick="navigate('transfer', document.querySelector('[onclick*=transfer]'))">
+          <div class="qa-icon">↗</div><div class="qa-label">Send Money</div>
+        </button>
+        <button class="qa-btn" onclick="showToast('Request link generated!', '🔗')">
+          <div class="qa-icon">↙</div><div class="qa-label">Request Money</div>
+        </button>
+        <button class="qa-btn" onclick="showToast('Statement downloaded!', '📄')">
+          <div class="qa-icon">📄</div><div class="qa-label">Statement</div>
+        </button>
+        <button class="qa-btn" onclick="navigate('loans', document.querySelector('[onclick*=loans]'))">
+          <div class="qa-icon">🏦</div><div class="qa-label">Apply for Loan</div>
+        </button>
+        <button class="qa-btn" onclick="showToast('FD created successfully!', '✅')">
+          <div class="qa-icon">📈</div><div class="qa-label">Fixed Deposit</div>
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="section-header">
+          <div>
+            <div class="card-title">Recent Transactions</div>
+            <div class="card-subtitle">Last 5 activities</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="navigate('transactions', document.querySelector('[onclick*=transactions]'))">View All</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tx"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ TRANSFER ═══════════ -->
+    <section class="page" id="page-transfer">
+      <div style="max-width:600px;">
+        <div class="step-indicator">
+          <div class="step active" data-step="1"><div class="step-num">1</div><div class="step-label">Details</div></div>
+          <div class="step" data-step="2"><div class="step-num">2</div><div class="step-label">Review</div></div>
+          <div class="step" data-step="3"><div class="step-num">3</div><div class="step-label">Done</div></div>
+        </div>
+
+        <div class="card" id="transfer-step1">
+          <div class="card-title">Transfer Money</div>
+          <div class="card-subtitle">Send funds to any bank account instantly</div>
+          <div class="alert alert-info">💡 IMPS transfers are available 24/7 with instant credit.</div>
+          <div class="form-group">
+            <label>Transfer Type</label>
+            <select id="t-type">
+              <option>IMPS — Instant (24/7)</option>
+              <option>NEFT — Up to 2 hours</option>
+              <option>RTGS — High value (above ₹2L)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Beneficiary Name</label>
+            <input type="text" id="t-name" placeholder="Enter full name" />
+          </div>
+          <div class="form-group">
+            <label>Account Number</label>
+            <input type="text" id="t-acc" placeholder="Enter account number" />
+          </div>
+          <div class="form-group">
+            <label>IFSC Code</label>
+            <input type="text" id="t-ifsc" placeholder="e.g. SBIN0001234" />
+          </div>
+          <div class="form-group">
+            <label>Amount (₹)</label>
+            <div class="input-prefix">
+              <span>₹</span>
+              <input type="number" id="t-amount" placeholder="0.00" min="1" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Remarks (optional)</label>
+            <input type="text" id="t-remarks" placeholder="Add a note" />
+          </div>
+          <button class="btn btn-primary btn-full" onclick="transferStep2()">Continue to Review →</button>
+        </div>
+
+        <div class="card" id="transfer-step2" style="display:none;">
+          <div class="card-title">Review Transfer</div>
+          <div class="card-subtitle">Please verify the details before confirming</div>
+          <div class="review-box" id="review-details"></div>
+          <div class="alert alert-warning">⚠️ Please double-check the account number. Transfers cannot be reversed.</div>
+          <div style="display:flex;gap:12px;">
+            <button class="btn btn-outline" onclick="transferBack()">← Back</button>
+            <button class="btn btn-gold btn-full" onclick="transferConfirm()">Confirm & Send ✓</button>
+          </div>
+        </div>
+
+        <div class="card" id="transfer-step3" style="display:none;text-align:center;padding:48px 24px;">
+          <div style="font-size:56px;margin-bottom:16px;">✅</div>
+          <div class="success-title">Transfer Successful!</div>
+          <div style="color:var(--text-muted);margin-bottom:8px;" id="success-amount"></div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:28px;" id="success-ref"></div>
+          <button class="btn btn-primary" onclick="transferReset()">Make Another Transfer</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ TRANSACTIONS ═══════════ -->
+    <section class="page" id="page-transactions">
+      <div class="filter-bar">
+        <input type="text" id="tx-search" placeholder="🔍  Search transactions..." oninput="filterTx()" />
+        <select id="tx-filter" onchange="filterTx()">
+          <option value="all">All Transactions</option>
+          <option value="credit">Credit Only</option>
+          <option value="debit">Debit Only</option>
+        </select>
+        <select id="tx-cat" onchange="filterTx()">
+          <option value="all">All Categories</option>
+          <option value="salary">Salary</option>
+          <option value="food">Food</option>
+          <option value="transport">Transport</option>
+          <option value="shopping">Shopping</option>
+          <option value="utilities">Utilities</option>
+          <option value="transfer">Transfer</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="showToast('Statement exported!','📄')">Export CSV</button>
+      </div>
+
+      <div class="card">
+        <div class="section-header">
+          <div>
+            <div class="card-title">All Transactions</div>
+            <div class="card-subtitle" id="tx-count">Showing all records</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Date & Time</th>
+                <th>Category</th>
+                <th>Reference</th>
+                <th>Amount</th>
+                <th>Balance After</th>
+              </tr>
+            </thead>
+            <tbody id="all-tx"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ LOANS ═══════════ -->
+    <section class="page" id="page-loans">
+      <div class="alert alert-success">✓ Your credit score is <strong>782</strong> — Excellent. You qualify for premium loan rates.</div>
+
+      <div class="grid-3">
+        <div class="loan-card">
+          <div class="loan-type">Home Loan</div>
+          <div class="loan-amount">₹45,00,000</div>
+          <div class="loan-meta">8.5% p.a. · 20 yrs · EMI: ₹39,084</div>
+          <div class="loan-stats">
+            <div><div class="loan-stat-label">Paid</div><div class="loan-stat-val">₹9,38,016</div></div>
+            <div><div class="loan-stat-label">Outstanding</div><div class="loan-stat-val">₹35,61,984</div></div>
+            <div><div class="loan-stat-label">Remaining</div><div class="loan-stat-val">216 EMIs</div></div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:20%;background:var(--gold)"></div></div>
+          <div class="progress-label">20% repaid</div>
+          <hr class="divider" />
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" onclick="showToast('Statement downloaded!','📄')">Statement</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Prepayment initiated!','✅')">Prepay</button>
+          </div>
+        </div>
+
+        <div class="loan-card">
+          <div class="loan-type">Personal Loan</div>
+          <div class="loan-amount">₹3,00,000</div>
+          <div class="loan-meta">12.5% p.a. · 3 yrs · EMI: ₹10,056</div>
+          <div class="loan-stats">
+            <div><div class="loan-stat-label">Paid</div><div class="loan-stat-val">₹1,80,008</div></div>
+            <div><div class="loan-stat-label">Outstanding</div><div class="loan-stat-val">₹1,19,992</div></div>
+            <div><div class="loan-stat-label">Remaining</div><div class="loan-stat-val">12 EMIs</div></div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:60%;background:#1A4FA0"></div></div>
+          <div class="progress-label">60% repaid</div>
+          <hr class="divider" />
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" onclick="showToast('Statement downloaded!','📄')">Statement</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Prepayment initiated!','✅')">Prepay</button>
+          </div>
+        </div>
+
+        <div class="loan-card loan-card-add" onclick="showLoanApply()">
+          <div style="font-size:32px;margin-bottom:12px;">＋</div>
+          <div style="font-weight:600;margin-bottom:6px;">Apply for New Loan</div>
+          <div style="font-size:12px;color:var(--text-muted)">Home · Personal · Vehicle · Education</div>
+        </div>
+      </div>
+
+      <div class="card" id="loan-form" style="display:none;max-width:600px;margin-top:8px;">
+        <div class="card-title">New Loan Application</div>
+        <div class="card-subtitle">Fill in details — instant eligibility check</div>
+        <div class="grid-2" style="margin-bottom:0;">
+          <div class="form-group">
+            <label>Loan Type</label>
+            <select><option>Home Loan</option><option>Personal Loan</option><option>Vehicle Loan</option><option>Education Loan</option></select>
+          </div>
+          <div class="form-group">
+            <label>Loan Amount (₹)</label>
+            <div class="input-prefix"><span>₹</span><input type="number" placeholder="500000" /></div>
+          </div>
+          <div class="form-group">
+            <label>Tenure (Years)</label>
+            <select><option>1</option><option>3</option><option>5</option><option>10</option><option>15</option><option>20</option></select>
+          </div>
+          <div class="form-group">
+            <label>Annual Income (₹)</label>
+            <div class="input-prefix"><span>₹</span><input type="number" placeholder="1200000" /></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;">
+          <button class="btn btn-outline" onclick="document.getElementById('loan-form').style.display='none'">Cancel</button>
+          <button class="btn btn-gold btn-full" onclick="showToast('Application submitted!','✅');document.getElementById('loan-form').style.display='none'">Submit Application</button>
+        </div>
+      </div>
+
+      <div class="card" style="max-width:600px;margin-top:24px;">
+        <div class="card-title">EMI Calculator</div>
+        <div class="card-subtitle">Estimate your monthly installment</div>
+        <div class="grid-3" style="margin-bottom:16px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Principal (₹)</label>
+            <input type="number" id="emi-p" value="1000000" oninput="calcEMI()" />
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Rate (% p.a.)</label>
+            <input type="number" id="emi-r" value="8.5" step="0.1" oninput="calcEMI()" />
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Tenure (Years)</label>
+            <input type="number" id="emi-t" value="20" oninput="calcEMI()" />
+          </div>
+        </div>
+        <div class="emi-result-box">
+          <div>
+            <div class="emi-label">Monthly EMI</div>
+            <div class="emi-value" id="emi-result">₹8,678</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="emi-sub-label">Total Interest</div>
+            <div class="emi-sub-val" id="emi-interest">₹10,82,720</div>
+            <div class="emi-sub-label" style="margin-top:6px;">Total Payment</div>
+            <div class="emi-sub-val" id="emi-total">₹20,82,720</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SETTINGS ═══════════ -->
+    <section class="page" id="page-settings">
+      <div class="profile-header">
+        <div class="profile-avatar">RK</div>
+        <div>
+          <div class="profile-name">Rahul Kumar</div>
+          <div class="profile-since">Member since March 2019</div>
+          <div class="profile-tier">⭐ Nexa Gold Member</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;">
+          <div style="font-size:11px;color:rgba(255,255,255,0.5);">Credit Score</div>
+          <div class="credit-score">782</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.5);">Excellent</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Personal Information</div>
+          <div class="card-subtitle">Update your personal details</div>
+          <div class="form-group"><label>Full Name</label><input type="text" value="Rahul Kumar" /></div>
+          <div class="form-group"><label>Email Address</label><input type="email" value="rahul.kumar@email.com" /></div>
+          <div class="form-group"><label>Mobile Number</label><input type="tel" value="+91 98765 43210" /></div>
+          <div class="form-group"><label>Date of Birth</label><input type="date" value="1992-08-15" /></div>
+          <div class="form-group"><label>PAN Number</label><input type="text" value="ABCPK1234D" /></div>
+          <button class="btn btn-primary btn-full" onclick="showToast('Profile updated!','✅')">Save Changes</button>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-title">Security Settings</div>
+            <div class="card-subtitle">Manage your account security</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div class="security-row">
+                <div><div class="security-name">Two-Factor Authentication</div><div class="security-desc">OTP via SMS & Email</div></div>
+                <span class="badge badge-success">Enabled</span>
+              </div>
+              <div class="security-row">
+                <div><div class="security-name">Transaction Limit</div><div class="security-desc">₹1,00,000 per day</div></div>
+                <button class="btn btn-outline btn-sm" onclick="showToast('Limit update request sent!','📋')">Edit</button>
+              </div>
+              <div class="security-row">
+                <div><div class="security-name">Login Alerts</div><div class="security-desc">SMS + Email notifications</div></div>
+                <span class="badge badge-success">Active</span>
+              </div>
+            </div>
+            <hr class="divider" />
+            <button class="btn btn-outline btn-full" onclick="showToast('OTP sent to registered mobile!','📲')">Change MPIN / Password</button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Linked Accounts</div>
+            <div class="card-subtitle">Manage your connected accounts</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div class="linked-row">
+                <div><div style="font-size:13px;font-weight:500;">Savings Account</div><div style="font-size:12px;color:var(--text-muted);">••••8472 · Primary</div></div>
+                <span class="badge badge-success">Active</span>
+              </div>
+              <div class="linked-row">
+                <div><div style="font-size:13px;font-weight:500;">Fixed Deposit</div><div style="font-size:12px;color:var(--text-muted);">₹1,50,000 · Matures Aug 2026</div></div>
+                <span class="badge badge-info">Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- end .main -->
+
+  <script src="script.js"></script>
 </body>
 </html>
